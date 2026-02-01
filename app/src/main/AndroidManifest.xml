@@ -13,6 +13,16 @@
         android:theme="@style/Theme.QuizAppHvl"
         tools:targetApi="31">
         <activity
+            android:name=".QuizActivity"
+            android:exported="false"
+            android:label="@string/title_activity_quiz"
+            android:theme="@style/Theme.QuizAppHvl" />
+        <activity
+            android:name=".GalleryActivity"
+            android:exported="false"
+            android:label="@string/title_activity_gallery"
+            android:theme="@style/Theme.QuizAppHvl" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
