@@ -20,6 +20,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -51,19 +53,40 @@ fun Greeting2(name: String, modifier: Modifier = Modifier) {
         ShowImageToGuess(galleryItems)
 }
 
+/**
+ * @param items: the complete list of the items contented in the gallery of the application
+ */
 @Composable
 fun ShowImageToGuess(items: List<GalleryItem>) {
-    var item1 = items.random()
+    var item1 = items.random() //this will be the item linked to the image to guess
+
+    // the following three variables are saved with by remember because we want to mantain their state during the execution of the application
     var score by remember { mutableIntStateOf(0) }
     var attempts by remember {mutableIntStateOf(0)}
     var mexFeedback by remember {mutableStateOf("Guess the flag.")}
+
     Row{
         Column {
-            Image(
-                painter = painterResource(id = item1.idImage),
-                contentDescription = item1.name,
-                modifier = Modifier.size(180.dp)
-            )
+            if(item1.idImage <= -1) { //the item chose casually was added from the user, so it has to be loaded in a different way
+                val context = LocalContext.current
+                val bitmap = item1.imageUri?.let { getBitmapFromUri(context, it)?.asImageBitmap() }
+                if(bitmap == null)
+                    Log.d("QQQQ - ", "BITMAP E' NULL")
+                if (bitmap != null) {
+                    Log.d("QQQQ - ", "bitmap non è NULL")
+                    Image(
+                        bitmap = bitmap,
+                        contentDescription = item1.name,
+                        modifier = Modifier.size(160.dp))
+                }
+            }
+            else {
+                Image(
+                    painter = painterResource(id = item1.idImage),
+                    contentDescription = item1.name,
+                    modifier = Modifier.size(180.dp)
+                )
+            }
             Text(mexFeedback)
             Text("Your actual score is: $score/$attempts")
 
@@ -73,9 +96,11 @@ fun ShowImageToGuess(items: List<GalleryItem>) {
             elementsToGuess.add(item1)
             var item2: GalleryItem
             var item3: GalleryItem
-            do {
+
+            do {  //pick casually an item from the list until it will be different from the item1
                 item2 = items.random()
             } while (item1.idImage == item2.idImage)
+
             do {
                 item3 = items.random()
             } while (item1.idImage == item3.idImage || item2.idImage == item3.idImage)
@@ -83,7 +108,9 @@ fun ShowImageToGuess(items: List<GalleryItem>) {
             elementsToGuess.add(item2)
             elementsToGuess.add(item3)
             elementsToGuess.shuffle()
+
             var itemCorrectName = item1.name
+
             Button(onClick = {
                 attempts++
                 if (verifyAnswer(item1, elementsToGuess[0])) {
@@ -124,7 +151,12 @@ fun ShowImageToGuess(items: List<GalleryItem>) {
     }
 }
 
-
+/**
+ * @param itemCorrect: this is the item that the user should guess
+ * @param item: this is the item that the user has choose
+ *
+ * @return true if the id of the item is the same of itemCorrect, false otherwise
+ * */
 fun verifyAnswer(itemCorrect: GalleryItem, item: GalleryItem) : Boolean {
     if(itemCorrect.idImage == item.idImage)
         return true
