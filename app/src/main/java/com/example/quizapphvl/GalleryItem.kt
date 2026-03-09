@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.compose.runtime.mutableStateListOf
+import androidx.lifecycle.ViewModel
 
 /***
  * @param name: the name associated to the image (it is supposed be a name of a Country)
@@ -17,9 +18,24 @@ data class GalleryItem(
     val imageUri: Uri? = null
 )
 
+class MyItems : ViewModel() {
+    val galleryItems = mutableStateListOf(
+        GalleryItem("French", R.drawable.fr),
+        GalleryItem("Spain", R.drawable.es),
+        GalleryItem("Norway", R.drawable.no),
+        GalleryItem("Mexico", R.drawable.mx),
+        GalleryItem("Nauru", R.drawable.nr)
+    )
+
+    fun removeAt(index: Int) {
+        galleryItems.removeAt(index)
+    }
+}
+
 /***
  * This is a default set of images
  * */
+
 val galleryItems = mutableStateListOf(
     GalleryItem("French", R.drawable.fr),
     GalleryItem("Spain", R.drawable.es),

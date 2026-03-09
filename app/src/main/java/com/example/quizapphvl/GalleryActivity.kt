@@ -67,13 +67,6 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    QuizAppHvlTheme {
-        Greeting("Android")
-    }
-}
 /**
  * @param items a List of GalleryItem elements
  * @param Modifier to modify with attributes expressed in the call of the function
@@ -204,5 +197,6 @@ fun sort2(){
         it.name
     }
 }
+
 
 

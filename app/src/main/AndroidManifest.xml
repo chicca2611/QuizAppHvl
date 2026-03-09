@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+    <uses-permission android:name="android.permission.READ_USER_DICTIONARY"/>
 
     <application
         android:allowBackup="true"
@@ -12,6 +13,18 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.QuizAppHvl"
         tools:targetApi="31">
+        <provider
+            android:name=".QuizContentProvider"
+            android:authorities="com.example.quizapphvl.provider"
+            android:exported="true"/>
+        <activity
+            android:name=".QuizActivity3"
+            android:exported="false"
+            android:label="@string/title_activity_quiz3"
+            android:theme="@style/Theme.QuizAppHvl" />
+        <activity
+            android:name=".GalleryActivity2"
+            android:exported="false" />
         <activity
             android:name=".ExpActitivty"
             android:exported="false"

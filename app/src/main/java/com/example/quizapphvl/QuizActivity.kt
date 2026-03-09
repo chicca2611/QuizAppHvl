@@ -14,29 +14,31 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
 import com.example.quizapphvl.ui.theme.QuizAppHvlTheme
+import kotlin.collections.shuffle
+import androidx.activity.viewModels
 
 class QuizActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //enableEdgeToEdge()
+        Log.d("QQQQ", "I'm inside the onCreate function after the super.onCreate")
+        val model: MyElements by viewModels<MyElements>()
+
         setContent {
             QuizAppHvlTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Greeting2(
                         name = "Android",
-                        modifier = Modifier.padding(innerPadding)
+                        modifier = Modifier.padding(innerPadding),
+                        model
                     )
                 }
             }
@@ -44,111 +46,141 @@ class QuizActivity : ComponentActivity() {
     }
 }
 
+class MyElements : ViewModel {
+
+    constructor() {
+        this.updateState(galleryItems)
+        Log.d("QQQQ", "I'm inside the constructor of viewModel")
+    }
+
+    var score = mutableIntStateOf(0)
+    var attempts = mutableIntStateOf(0)
+    var mexFeedback = mutableStateOf("Guess the flag")
+
+    var elementsToGuess = mutableListOf<GalleryItem>()
+        private set
+    lateinit var itemCorrect: GalleryItem
+        private set
+    lateinit var item2 : GalleryItem
+        private set
+    lateinit var item3 : GalleryItem
+       private set
+
+    fun updateState(items: List<GalleryItem>) {
+        Log.d("QQQQ", "entrata in updateState")
+        var correctItem : GalleryItem
+        if(attempts.intValue == 0) {
+            correctItem = items.random()
+        }
+        else {
+            do {
+                correctItem = items.random()
+                Log.d("QQQQ", "loop")
+            } while(correctItem.idImage == itemCorrect.idImage)
+        }
+
+        val elementsToGuess = mutableListOf<GalleryItem>()
+        elementsToGuess.add(correctItem)
+
+        var item2: GalleryItem
+        var item3: GalleryItem
+
+        do {  //pick casually an item from the list until it will be different from the item1
+            item2 = items.random()
+        } while (correctItem.idImage == item2.idImage)
+
+        do {
+            item3 = items.random()
+        } while (correctItem.idImage == item3.idImage || item2.idImage == item3.idImage)
+        Log.d("QQQQ", "finiti gli item update")
+        elementsToGuess.add(item2)
+        elementsToGuess.add(item3)
+        elementsToGuess.shuffle()
+
+        this.itemCorrect = correctItem
+        this.item2 = item2
+        this.item3 = item3
+        this.elementsToGuess = elementsToGuess
+    }
+}
+
 @Composable
-fun Greeting2(name: String, modifier: Modifier = Modifier) {
-    Log.d("DEBUG BY FEDER - ", "value of size: " + galleryItems.size)
+fun Greeting2(name: String, modifier: Modifier = Modifier, model: MyElements) {
+
+    Log.d("QQQQ", "value of size: " + galleryItems.size)
     if(galleryItems.size<3)
         Text("Sorry, but there aren't sufficient elements to play the game. Please, add at least " + (3 - galleryItems.size) + " elements to play")
     else
-        ShowImageToGuess(galleryItems)
+        ShowImageToGuess(galleryItems, model)
 }
 
 /**
  * @param items: the complete list of the items contented in the gallery of the application
  */
+//@SuppressLint("AutoboxingStateValueProperty")
 @Composable
-fun ShowImageToGuess(items: List<GalleryItem>) {
-    var item1 = items.random() //this will be the item linked to the image to guess
-
-    // the following three variables are saved with by remember because we want to mantain their state during the execution of the application
-    var score by remember { mutableIntStateOf(0) }
-    var attempts by remember {mutableIntStateOf(0)}
-    var mexFeedback by remember {mutableStateOf("Guess the flag.")}
-
+fun ShowImageToGuess(items: List<GalleryItem>, model: MyElements) {
     Row{
         Column {
-            if(item1.idImage <= -1) { //the item chose casually was added from the user, so it has to be loaded in a different way
-                val context = LocalContext.current
-                val bitmap = item1.imageUri?.let { getBitmapFromUri(context, it)?.asImageBitmap() }
-                if(bitmap == null)
-                    Log.d("QQQQ - ", "BITMAP E' NULL")
-                if (bitmap != null) {
-                    Log.d("QQQQ - ", "bitmap non è NULL")
+                if(model.itemCorrect.idImage <= -1) { //the item chose casually was added from the user, so it has to be loaded in a different way
+                    val context = LocalContext.current
+                    val bitmap = model.itemCorrect.imageUri?.let { getBitmapFromUri(context, it)?.asImageBitmap() }
+                    if(bitmap == null)
+                        Log.d("QQQQ - ", "BITMAP E' NULL")
+                    if (bitmap != null) {
+                        Log.d("QQQQ - ", "bitmap non è NULL")
+                        Image(
+                            bitmap = bitmap,
+                            contentDescription = model.itemCorrect.name,
+                            modifier = Modifier.size(160.dp))
+                    }
+                }
+                else {
                     Image(
-                        bitmap = bitmap,
-                        contentDescription = item1.name,
-                        modifier = Modifier.size(160.dp))
+                        painter = painterResource(id = model.itemCorrect.idImage),
+                        contentDescription = model.itemCorrect.name,
+                        modifier = Modifier.size(180.dp)
+                    )
                 }
-            }
-            else {
-                Image(
-                    painter = painterResource(id = item1.idImage),
-                    contentDescription = item1.name,
-                    modifier = Modifier.size(180.dp)
-                )
-            }
-            Text(mexFeedback)
-            Text("Your actual score is: $score/$attempts")
+                Text(model.mexFeedback.value)
+                var printScore = model.score.intValue
+                var printAttempts = model.attempts.intValue
+                Text("your actual score is: $printScore/$printAttempts")
 
-
-
-            val elementsToGuess = mutableListOf<GalleryItem>()
-            elementsToGuess.add(item1)
-            var item2: GalleryItem
-            var item3: GalleryItem
-
-            do {  //pick casually an item from the list until it will be different from the item1
-                item2 = items.random()
-            } while (item1.idImage == item2.idImage)
-
-            do {
-                item3 = items.random()
-            } while (item1.idImage == item3.idImage || item2.idImage == item3.idImage)
-
-            elementsToGuess.add(item2)
-            elementsToGuess.add(item3)
-            elementsToGuess.shuffle()
-
-            var itemCorrectName = item1.name
-
-            Button(onClick = {
-                attempts++
-                if (verifyAnswer(item1, elementsToGuess[0])) {
-                    score++
-                    mexFeedback = "Correct! Good job. Let's try again? :)"
+                Button(onClick = {
+                    buttonToGuessPressed(model.itemCorrect, model.elementsToGuess[0], model)
+                },
+                    modifier = Modifier.weight(1f)) {
+                    Text(model.elementsToGuess[0].name)
                 }
-                else
-                    mexFeedback = "Ops, this is the wrong answer. The correct answer was $itemCorrectName"
-            },
-                modifier = Modifier.weight(1f)) {
-                Text(elementsToGuess[0].name)
-            }
-            Button(onClick = {
-                attempts++
-                if (verifyAnswer(item1, elementsToGuess[1])){
-                    score++
-                    mexFeedback = "Correct! Good job. Let's try again? :)"
+                Button(onClick = {
+                    buttonToGuessPressed(model.itemCorrect, model.elementsToGuess[1], model)
+                },
+                    modifier = Modifier.weight(1f)) {
+                    Text(model.elementsToGuess[1].name)
                 }
-                else
-                    mexFeedback = "Ops, this is the wrong answer. The correct answer was $itemCorrectName"
-            },
-                modifier = Modifier.weight(1f)) {
-                Text(elementsToGuess[1].name)
-            }
-            Button(onClick = {
-                attempts++
-                if (verifyAnswer(item1, elementsToGuess[2])){
-                    score++
-                    mexFeedback = "Correct! Good job. Let's try again? :)"
+                Button(onClick = {
+                    buttonToGuessPressed(model.itemCorrect, model.elementsToGuess[2], model)
+                },
+                    modifier = Modifier.weight(1f)) {
+                    Text(model.elementsToGuess[2].name)
                 }
-                else
-                    mexFeedback = "Ops, this is the wrong answer. The correct answer was $itemCorrectName"
-            },
-                modifier = Modifier.weight(1f)) {
-                Text(elementsToGuess[2].name)
-            }
         }
     }
+}
+
+
+fun buttonToGuessPressed(itemCorrect: GalleryItem?, elementToGuess: GalleryItem, model: MyElements) {
+    model.attempts.intValue++
+    var itemCorrectName = itemCorrect?.name
+    if(verifyAnswer(itemCorrect, elementToGuess)) {
+        model.score.intValue++
+        model.mexFeedback.value = "Correct! Good job. Let's try again? :)"
+    }
+    else
+        model.mexFeedback.value = "Ops, this is the wrong answer. The correct answer was $itemCorrectName"
+
+    model.updateState(galleryItems)
 }
 
 /**
@@ -157,16 +189,9 @@ fun ShowImageToGuess(items: List<GalleryItem>) {
  *
  * @return true if the id of the item is the same of itemCorrect, false otherwise
  * */
-fun verifyAnswer(itemCorrect: GalleryItem, item: GalleryItem) : Boolean {
-    if(itemCorrect.idImage == item.idImage)
+fun verifyAnswer(itemCorrect: GalleryItem?, item: GalleryItem) : Boolean {
+    if(itemCorrect?.idImage == item.idImage)
         return true
     return false
 }
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview2() {
-    QuizAppHvlTheme {
-        Greeting2("Android")
-    }
-}

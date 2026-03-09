@@ -2,6 +2,7 @@ package com.example.quizapphvl
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -11,6 +12,7 @@ import androidx.core.view.WindowInsetsCompat
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.d("VS","x")
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
@@ -21,13 +23,13 @@ class MainActivity : AppCompatActivity() {
 
         val activityGallery: Button = findViewById<Button>(R.id.buttonGallery)
         activityGallery.setOnClickListener {
-            val intent = Intent(this, GalleryActivity::class.java)
+            val intent = Intent(this, GalleryActivity2::class.java)
             startActivity(intent)
         }
 
        val quizActivity: Button = findViewById<Button>(R.id.buttonQuiz)
         quizActivity.setOnClickListener {
-            val intent = Intent(this, QuizActivity::class.java)
+            val intent = Intent(this, QuizActivity3::class.java)
             startActivity(intent)
         }
     }
