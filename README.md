@@ -31,20 +31,23 @@ Row: 2 name=French, imageUri=android.resource://com.example.quizapphvl/213116532
 Row: 3 name=Mexico, imageUri=android.resource://com.example.quizapphvl/2131165403
 Row: 4 name=Pizza, imageUri=content://media/picker/0/com.android.providers.media.photopicker/media/1000081048
 ```
-TODO: it would be much more better if I removed the idImage and I used the same URI for every image and not only for the images added from the Gallery.
 
-*TEST JAVA ESPRESSO*
-**Clicking a button in the main-menu takes ou to the right sub-activty.**
+**TEST JAVA ESPRESSO**
+
+***Clicking a button in the main-menu takes ou to the right sub-activty.***
+
 I chose the Gallery Activity.
 To make the test working, I started a new Rule that says that the test has to start from the MainActivity, then, it search for a button with this id: `buttonGallery`, so it tries to press the button and, if after pressing the button, it sees that exist a node where it's written "GALLERY OF WORLD'S FLAGS", so this means that the code works correctly and the test pass.
 
-**Is the score update correctly in the quiz (the test submits at least one right/wrong answer each and you check if the score is correct afterwards**
+***Is the score update correctly in the quiz (the test submits at least one right/wrong answer each and you check if the score is correct afterwards***
+
 To test this I had to modify a little the code of my QuizActivity.
 I added differents tags that checked for the button linked to the correct answer and for one button linked to the wrong answer.
 After this, I started a new Rule that says that the test has to start from the GalleryActivity, for the case of the correct button, the test behaves in this way: it search for the button linked to the "correctButton" tag, then, it press the button. At this point, it search the node linked to the "textWithScore" button, and, if its text is equal to "your actual score is: 1/1", it means that the test pass.
 For the case of the wrong button, the test behaves in the same way, but it search for a different text: "your actual score is: 0/1".
 
-**A test that checks that the number of registered pictures/persons is correct after adding/deleting an entry.**
+***A test that checks that the number of registered pictures/persons is correct after adding/deleting an entry.***
+
 This type of test was a little more difficult to implement.
 Firstly, I created the two rules, one for the composeActivity, the other one for the intent.
 But after that, I understood that this could create problem because it's wrong having two same rules for the same test (in this particular case, the test works, but it's a lot slower)
