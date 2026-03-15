@@ -21,7 +21,7 @@ class QuizContentProvider : ContentProvider() {
             .openHelper
             .readableDatabase
 
-        return db.query("SELECT name, idImage, imageUri AS URI FROM image")
+        return db.query("SELECT name, imageUri FROM image")
     }
 
 

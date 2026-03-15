@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import com.example.quizapphvl.ui.theme.QuizAppHvlTheme
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.platform.testTag
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 class QuizActivity3 : ComponentActivity() {
@@ -70,7 +71,7 @@ fun ShowImageToGuess3(model: MyElementsQuizViewModel) {
         Column {
            val context = LocalContext.current
 
-            val bitmap = model.itemCorrect?.imageUri?.let { getBitmapFromUri(context, it)?.asImageBitmap() }
+            val bitmap = model.itemCorrect?.imageUri?.let { getBitmapFromUriResource(context, it)?.asImageBitmap() }
             if(bitmap != null) {
                 Image(
                     bitmap = bitmap,
@@ -87,23 +88,40 @@ fun ShowImageToGuess3(model: MyElementsQuizViewModel) {
             Text(model.mexFeedback)
             val printScore = model.score
             val printAttempts = model.attempts
-            Text("your actual score is: $printScore/$printAttempts")
+            Text("your actual score is: $printScore/$printAttempts", Modifier.testTag("textWithScore"))
+            var tag1 = ""
+            var tag2 = ""
+            var tag3 = ""
+            if(model.itemCorrect?.idItem == items[0].idItem) {
+                tag1 = "correctButton"
+                tag2 = "wrongButton"
+            }
+            else if(model.itemCorrect?.idItem == items[1].idItem) {
+                tag1 = "wrongButton"
+                tag2 = "correctButton"
+            }
+            else {
+                tag1 = "wrongButton"
+                tag3 = "correctButton"
+            }
             Button(onClick = {
                 buttonToGuessPressed3(model.itemCorrect, items[0], model)
             },
-                modifier = Modifier.weight(1f)) {
+                modifier = Modifier.weight(1f).testTag(tag1)) {
                 Text(items[0].name)
             }
+
             Button(onClick = {
                 buttonToGuessPressed3(model.itemCorrect, items[1], model)
             },
-                modifier = Modifier.weight(1f)) {
+                modifier = Modifier.weight(1f).testTag(tag2)) {
                 Text(items[1].name)
             }
+
             Button(onClick = {
                 buttonToGuessPressed3(model.itemCorrect, items[2], model)
             },
-                modifier = Modifier.weight(1f)) {
+                modifier = Modifier.weight(1f).testTag(tag3)) {
                 Text(items[2].name)
             }
         }
@@ -115,7 +133,7 @@ fun ShowImageToGuess3(model: MyElementsQuizViewModel) {
 fun buttonToGuessPressed3(itemCorrect: GalleryItem1?, elementToGuess: GalleryItem1, model: MyElementsQuizViewModel) {
     model.attempts++
     var itemCorrectName = itemCorrect?.name
-    if(verifyAnswer3(itemCorrect, elementToGuess)) {
+    if(verifyAnswer3(itemCorrect?.idItem ?: -1, elementToGuess.idItem)) {
         model.score++
         model.mexFeedback = "Correct! Good job. Let's try again? :)"
     }
@@ -131,8 +149,8 @@ fun buttonToGuessPressed3(itemCorrect: GalleryItem1?, elementToGuess: GalleryIte
  *
  * @return true if the id of the item is the same of itemCorrect, false otherwise
  * */
-fun verifyAnswer3(itemCorrect: GalleryItem1?, item: GalleryItem1) : Boolean {
-    if(itemCorrect?.idDrawable == item.idDrawable)
+fun verifyAnswer3(itemCorrectId: Int, itemId: Int) : Boolean {
+    if(itemCorrectId == itemId)
         return true
     return false
 }

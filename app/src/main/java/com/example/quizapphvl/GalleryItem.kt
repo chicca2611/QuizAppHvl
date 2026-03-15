@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 
@@ -54,8 +55,14 @@ val galleryItems = mutableStateListOf(
  * https://developer.android.com/training/data-storage/shared/photo-picker?hl=it
  * */
 fun getBitmapFromUri(context: Context, uri: Uri): Bitmap? {
+    Log.d("QQQQ", "" + uri)
     val parcelFileDescriptor = context.contentResolver.openFileDescriptor(uri, "r") ?: return null
+    Log.d("QQQQ", "parcelFileDescriptor success")
     val bitmap = BitmapFactory.decodeFileDescriptor(parcelFileDescriptor.fileDescriptor)
+    Log.d("QQQQ", "bitmap transforming success")
     parcelFileDescriptor.close()
+    Log.d("QQQQ","returning bitmap")
     return bitmap
 }
+
+
