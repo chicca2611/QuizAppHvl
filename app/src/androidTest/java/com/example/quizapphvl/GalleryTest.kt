@@ -25,7 +25,7 @@ without any user interaction
 * */
 class GalleryTest {
     @get:Rule
-    val composeGalleryTestRule = createAndroidComposeRule<GalleryActivity2>()
+    val composeGalleryTestRule = createAndroidComposeRule<GalleryActivity>()
 
    // var numberImagesTest = 0
     @Before
