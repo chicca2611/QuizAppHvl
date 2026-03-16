@@ -18,19 +18,6 @@
             android:authorities="com.example.quizapphvl.provider"
             android:exported="true"/>
         <activity
-            android:name=".QuizActivity3"
-            android:exported="false"
-            android:label="@string/title_activity_quiz3"
-            android:theme="@style/Theme.QuizAppHvl" />
-        <activity
-            android:name=".GalleryActivity2"
-            android:exported="false" />
-        <activity
-            android:name=".ExpActitivty"
-            android:exported="false"
-            android:label="@string/title_activity_exp_actitivty"
-            android:theme="@style/Theme.QuizAppHvl" />
-        <activity
             android:name=".QuizActivity"
             android:exported="false"
             android:label="@string/title_activity_quiz"

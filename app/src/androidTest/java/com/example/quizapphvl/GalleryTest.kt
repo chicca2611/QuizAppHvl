@@ -8,7 +8,6 @@ import org.junit.Test
 import android.app.Activity
 import android.net.Uri
 import androidx.compose.ui.test.assertTextEquals
-import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
@@ -24,7 +23,7 @@ For adding, use Intent Stubbling to return some image data (es. from the resourc
 without any user interaction
 
 * */
-class Tester3 {
+class GalleryTest {
     @get:Rule
     val composeGalleryTestRule = createAndroidComposeRule<GalleryActivity2>()
 
